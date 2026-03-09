@@ -1,0 +1,49 @@
+\documentclass[11pt,a4paper]{article}
+\usepackage[margin=0.75in]{geometry}
+\usepackage[T1]{fontenc}
+\usepackage[utf8]{inputenc}
+\usepackage{hyperref}
+\usepackage{enumitem}
+\usepackage{titlesec}
+\usepackage{parskip}
+
+\hypersetup{
+  colorlinks=true,
+  linkcolor=blue,
+  urlcolor=blue
+}
+
+\titleformat{\section}{\large\bfseries}{}{0em}{}[\titlerule]
+\titlespacing*{\section}{0pt}{6pt}{4pt}
+
+\setlength{\parindent}{0pt}
+\setlength{\parskip}{4pt}
+
+\begin{document}
+
+% Header
+\begin{center}
+  {\LARGE \textbf{{{NAME}}}}\\[4pt]
+  \href{mailto:{{EMAIL}}}{{{EMAIL}}} $\bullet$
+  {{PHONE}} $\bullet$
+  {{LOCATION}}\\
+  \href{{{LINKEDIN}}}{LinkedIn} $\bullet$
+  \href{{{PORTFOLIO}}}{Portfolio}
+\end{center}
+
+\section{Education}
+{{EDUCATION_SECTION}}
+
+\section{Experience}
+{{EXPERIENCE_SECTION}}
+
+\section{Projects}
+{{PROJECTS_SECTION}}
+
+\section{Skills}
+{{SKILLS_SECTION}}
+
+\section{Achievements}
+{{ACHIEVEMENTS_SECTION}}
+
+\end{document}

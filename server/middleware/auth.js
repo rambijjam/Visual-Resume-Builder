@@ -8,7 +8,7 @@ const authMiddleware = (req,res,next)=>{
         return res.status(401).json({message:"Unauthorized"});
     }   
 
-    const secret = process.env.JWT_SECRET;
+    const secret = process.env.SECRET_KEY;
     if(!secret){
         return res.status(500).json({message:"Server configuration error"});
     }

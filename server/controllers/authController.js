@@ -2,7 +2,7 @@ const jwt = require("jsonwebtoken");
 const User = require("../models/User");
 
 const generateToken = (user)=>{
-    const secret = process.env.JWT_SECRET;
+    const secret = process.env.SECRET_KEY;
     if(!secret){
         throw new Error("JWT_SECRET is not defined in environment variables");
     }
@@ -16,6 +16,7 @@ const generateToken = (user)=>{
 
 exports.register = async (req,res)=>{
     try{
+        // console.log("Register Route is Called");
         const {name, email, password} = req.body;
         if(!email || !password || !name){
             return res.status(400).json({message:"Please provide all required fields"});
@@ -26,9 +27,10 @@ exports.register = async (req,res)=>{
             return res.status(400).json({message:"User already exists"});
         }   
         const user = await User.create({name, email, password});
-        const token = user.generateToken();
+        const token = generateToken(user);
         return res.status(201).json({token, user : {id: user._id, name: user.name, email: user.email}});
     }catch(error){
+        // console.log(error);
         res.status(500).json({message:"Server error", error: error.message});
     }
 };
@@ -47,7 +49,7 @@ exports.login = async (req,res)=>{
         if(!isMatch){
             return res.status(400).json({message:"Invalid credentials"});
         }
-        const token = user.generateToken();
+        const token = generateToken(user);
         return res.status(200).json({token, user : {id: user._id, name: user.name, email: user.email}});    
     }catch(error){
         res.status(500).json({message:"Server error", error: error.message});

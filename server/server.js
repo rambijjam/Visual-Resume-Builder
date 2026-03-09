@@ -12,7 +12,8 @@ app.use(express.json());
 app.use(express.urlencoded({extended:true}));
 
 app.use("/api/auth", require("./routes/auth"));
-
+app.use("/api/github", require("./routes/github"));
+app.use("/api/resume", require("./routes/resume"));
 
 const PORT = process.env.PORT || 5000;
 
