@@ -1,6 +1,6 @@
 let groq = null;
 
-const getGroqClient = ()=>{
+exports.getGroqClient = ()=>{
     if(!process.env.GROQ_API_KEY){
         throw new Error("GROQ_API_KEY is not configured");
     }

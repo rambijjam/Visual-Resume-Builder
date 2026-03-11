@@ -15,6 +15,7 @@ app.use("/api/auth", require("./routes/auth"));
 app.use("/api/github", require("./routes/github"));
 app.use("/api/resume", require("./routes/resume"));
 app.use("/api/ai", require('./routes/ai'));
+app.use("/api/ats", require('./routes/ats'));
 
 const PORT = process.env.PORT || 5000;
 
