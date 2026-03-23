@@ -35,6 +35,7 @@ exports.getrepoDetails = async (owner, repo) => {
             readme,
         };
     }catch(error){
+        // console.log(error)
         if(error.response && error.response.status === 404){    
             throw new Error('Repository not found');
         }else if(error.response && error.response.status === 403){  

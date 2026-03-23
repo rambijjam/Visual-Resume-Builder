@@ -7,6 +7,58 @@ const fs = require("fs");
 const util = require("util");
 const exec = util.promisify(require("child_process").exec);
 
+exports.previewResume = async (req, res)=>{
+  try{
+    const resumeData = req.body
+    const texContent = generateTex(resumeData);
+    const tempDir = path.join(__dirname, '../temp')
+
+    if(!fs.existsSync(tempDir)) fs.mkdirSync(tempDir);
+
+    const baseName = `preview_${Date.now()}`
+
+    const texPath = path.join(tempDir, `${baseName}.tex`)
+    const pdfPath = path.join(tempDir, `${baseName}.pdf`)
+
+    fs.writeFileSync(texPath, texContent)
+
+    //console.log("compiling....")
+
+    try{
+      const {stdout, stderr} = await exec(
+        `pdflatex -output-directory="${tempDir}" "${texPath}"`,
+        {timeout : 10000}
+      );
+
+      //console.log(stdout);
+      //console.log(stderr);
+    }catch(err){
+      console.log("Latex Error", err.stderr || err);
+      return res.status(500).json({
+        message : "Latex compile failed",
+        error : err.stderr
+      })
+    }
+
+    await exec(`pdflatex -output-directory="${tempDir}" "${texPath}"`)
+
+    res.sendFile(path.resolve(pdfPath))
+
+    //clean files
+    setTimeout(()=>{
+      const files = [".tex",".pdf",".aux",".log",".out"]
+
+      files.forEach(ext=>{
+        const file = path.join(tempDir, `${baseName}${ext}`)
+        if(fs.existsSync(file)) fs.unlinkSync(file)
+      })
+    }, 10000)
+  }catch(err){
+    console.log(err)
+    res.status(500).json({message : "Preview Compiler Failed", error : err.stderr|| err.message||err})
+  }
+}
+
 const deleteFiles = async (outputDir, baseName)=>{
   const fs = require('fs/promises');
   const extensionsToDelete = [".aux", ".log", ".out"];
@@ -21,9 +73,28 @@ const deleteFiles = async (outputDir, baseName)=>{
   }
 }
 
+const checkResume = (resumeData)=>{
+  const hasContent = (value)=>{
+    if(typeof value == 'string') return value.trim().length>0;
+
+    if(Array.isArray(value)){
+      return value.some((item)=>hasContent(item));
+    }
+
+    if(typeof value == 'object'){
+      return Object.values(value).some((v)=>hasContent(v));
+    }
+
+    return false;
+  }
+
+  return !hasContent(resumeData)
+}
+
 exports.generateResume = async (req, res) => {
   try {
     const resumeData = req.body;
+    if(checkResume(resumeData)) return res.status(400).json({message : 'Please enter something to generate the resume'})
     const texContent = generateTex(resumeData); // we have template for the latex content
     const filename = `resume_${req.user.id}_${Date.now()}.tex`; 
     const filePath = saveTex(texContent, filename); 
@@ -45,7 +116,7 @@ exports.generateResume = async (req, res) => {
       generatedPdfPath: pdfPath,
     });
 
-    res.json({ message: 'Resume generated successfully', resumeId: resume._id, texContent, filename });
+    res.json({ message: 'Resume generated successfully', resumeId: resume._id, texContent, filename,pdfName });
   } catch (error) {
     console.log(error);
     res.status(500).json({ message: 'Error generating resume', error: error.message });

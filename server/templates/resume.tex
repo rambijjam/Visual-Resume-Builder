@@ -1,49 +1,104 @@
-\documentclass[11pt,a4paper]{article}
-\usepackage[margin=0.75in]{geometry}
-\usepackage[T1]{fontenc}
-\usepackage[utf8]{inputenc}
-\usepackage{hyperref}
-\usepackage{enumitem}
-\usepackage{titlesec}
-\usepackage{parskip}
+\documentclass[letterpaper,11pt]{article}
 
-\hypersetup{
-  colorlinks=true,
-  linkcolor=blue,
-  urlcolor=blue
+\usepackage{latexsym}
+\usepackage[empty]{fullpage}
+\usepackage{titlesec}
+\usepackage{marvosym}
+\usepackage[usenames,dvipsnames]{color}
+\usepackage{verbatim}
+\usepackage{enumitem}
+\usepackage[hidelinks]{hyperref}
+\usepackage{fancyhdr}
+\usepackage[english]{babel}
+\usepackage{tabularx}
+\usepackage{fontawesome5}
+\usepackage{multicol}
+\setlength{\multicolsep}{-3.0pt}
+\setlength{\columnsep}{-1pt}
+\input{glyphtounicode}
+
+
+
+\pagestyle{fancy}
+\fancyhf{} 
+\fancyfoot{}
+\renewcommand{\headrulewidth}{0pt}
+\renewcommand{\footrulewidth}{0pt}
+
+
+\addtolength{\oddsidemargin}{-0.6in}
+\addtolength{\evensidemargin}{-0.5in}
+\addtolength{\textwidth}{1.19in}
+\addtolength{\topmargin}{-.7in}
+\addtolength{\textheight}{1.4in}
+
+\urlstyle{same}
+
+\raggedbottom
+\raggedright
+\setlength{\tabcolsep}{0in}
+
+\titleformat{\section}{
+  \vspace{-4pt}\scshape\raggedright\large\bfseries
+}{}{0em}{}[\color{black}\titlerule \vspace{-5pt}]
+
+
+\pdfgentounicode=1
+
+\newcommand{\resumeItem}[1]{
+  \item\small{
+    {#1 \vspace{-2pt}}
+  }
 }
 
-\titleformat{\section}{\large\bfseries}{}{0em}{}[\titlerule]
-\titlespacing*{\section}{0pt}{6pt}{4pt}
+\newcommand{\classesList}[4]{
+    \item\small{
+        {#1 #2 #3 #4 \vspace{-2pt}}
+  }
+}
 
-\setlength{\parindent}{0pt}
-\setlength{\parskip}{4pt}
+\newcommand{\resumeSubheading}[4]{
+  \vspace{-2pt}\item
+    \begin{tabular*}{1.0\textwidth}[t]{l@{\extracolsep{\fill}}r}
+      \textbf{#1} & \textbf{\small #2} \\
+      \textit{\small#3} & \textit{\small #4} \\
+    \end{tabular*}\vspace{-7pt}
+}
+
+\newcommand{\resumeSubSubheading}[2]{
+    \item
+    \begin{tabular*}{0.97\textwidth}{l@{\extracolsep{\fill}}r}
+      \textit{\small#1} & \textit{\small #2} \\
+    \end{tabular*}\vspace{-7pt}
+}
+
+\newcommand{\resumeProjectHeading}[2]{
+    \item
+    \begin{tabular*}{1.001\textwidth}{l@{\extracolsep{\fill}}r}
+      \small#1 & \textbf{\small #2}\\
+    \end{tabular*}\vspace{-7pt}
+}
+
+\newcommand{\resumeSubItem}[1]{\resumeItem{#1}\vspace{-4pt}}
+
+\renewcommand\labelitemi{$\vcenter{\hbox{\tiny$\bullet$}}$}
+\renewcommand\labelitemii{$\vcenter{\hbox{\tiny$\bullet$}}$}
+
+\newcommand{\resumeSubHeadingListStart}{\begin{itemize}[leftmargin=0.0in, label={}]}
+\newcommand{\resumeSubHeadingListEnd}{\end{itemize}}
+\newcommand{\resumeItemListStart}{\begin{itemize}}
+\newcommand{\resumeItemListEnd}{\end{itemize}\vspace{-5pt}}
+\newcommand\sbullet[1][.5]{\mathbin{\vcenter{\hbox{\scalebox{#1}{\tiny$\bullet$}}}}}
+\newcommand{\descript}[1]{\color{subheadings}\raggedright\hspace*{0pt}\hfill\vspace{3pt}\fontsize{11pt}{13pt}\selectfont {#1 \\} \normalfont}
 
 \begin{document}
 
-% Header
+
 \begin{center}
-  {\LARGE \textbf{{{NAME}}}}\\[4pt]
-  \href{mailto:{{EMAIL}}}{{{EMAIL}}} $\bullet$
-  {{PHONE}} $\bullet$
-  {{LOCATION}}\\
-  \href{{{LINKEDIN}}}{LinkedIn} $\bullet$
-  \href{{{PORTFOLIO}}}{Portfolio}
+\textbf{\Huge \scshape {{NAME}}} \\ \vspace{5pt}
+\small {{CONTACT_LINE}}
 \end{center}
 
-\section{Education}
-{{EDUCATION_SECTION}}
-
-\section{Experience}
-{{EXPERIENCE_SECTION}}
-
-\section{Projects}
-{{PROJECTS_SECTION}}
-
-\section{Skills}
-{{SKILLS_SECTION}}
-
-\section{Achievements}
-{{ACHIEVEMENTS_SECTION}}
+{{SECTIONS}}
 
 \end{document}

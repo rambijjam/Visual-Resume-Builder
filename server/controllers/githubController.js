@@ -16,7 +16,9 @@ exports.getRepo = async (req, res)=>{
 
         const repoData = await getrepoDetails(owner, repo.replace(/\.git$/,''));
         res.json(repoData);
+        //console.log(repoData)
     }catch(error){
+        //console.log(error)
         return res.status(500).json({message: ' Error Fetching Github Repo', error: error.message});
     }
 }
