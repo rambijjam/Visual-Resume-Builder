@@ -8,3 +8,50 @@ html, body, #root {
 body{
     font-family: 'Inter', sans-serif;
 }
+
+::-webkit-scrollbar-thumb:hover {
+  background: white;
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+* {
+  -webkit-overflow-scrolling: touch;
+}
+
+::-webkit-scrollbar {
+  width: 6px;
+}
+
+::-webkit-scrollbar-thumb {
+  background: white;
+  border-radius: 10px;
+}
+
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+
+.react-pdf__Page {
+  position: relative;
+}
+
+.react-pdf__Page__annotations {
+  position: absolute;
+  top: 0;
+  left: 0;
+  pointer-events: auto !important;
+  z-index: 10;
+}
+
+.react-pdf__Page__annotations a {
+  pointer-events: auto;
+  cursor: pointer;
+}
+
+html, body {
+  overscroll-behavior: none;
+}
