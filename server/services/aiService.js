@@ -1,8 +1,9 @@
 let groq = null;
 
-exports.getGroqClient = ()=>{
+const getGroqClient = ()=>{
     if(!process.env.GROQ_API_KEY){
-        throw new Error("GROQ_API_KEY is not configured");
+        console.log("GROQ_API_KEY is not configured")
+        return null;
     }
     if(!groq){
         const  Groq  = require('groq-sdk');
@@ -12,13 +13,13 @@ exports.getGroqClient = ()=>{
     return groq;
 }
 
-exports.generateBulletPoints = async (description)=>{
+const generatePointsfromDescription = async (description)=>{
     const client = getGroqClient();
-    if(!client){
+    if(!client){    
         return [
-            `• Developed and implemented ${description}`,
-            `• Collaborated with team members to deliver ${description}`,
-            `• Improved efficiency through ${description}`,
+            ` Developed and implemented ${description}`,
+            ` Collaborated with team members to deliver ${description}`,
+            ` Improved efficiency through ${description}`,
         ];
     }
     try{
@@ -27,7 +28,15 @@ exports.generateBulletPoints = async (description)=>{
             messages : [
                 {
                     role : 'system', 
-                    content : 'You are a professional resume writer. Generate 3-5 concise, impactful bullet points for a resume based on the provided description. Each bullet point should start with a strong action verb.',
+                    content : `You are a professional resume writer. 
+                            Generate 3-5 concise, impactful bullet points for a resume based on the provided description. 
+                            Each bullet point should start with a strong action verb.
+                            
+                            Return ONLY valid JSON:
+                            {
+                                "points": ["point1", "point2"]
+                            }
+                            `,
                 }, 
                 { 
                     role : 'user',
@@ -36,19 +45,29 @@ exports.generateBulletPoints = async (description)=>{
             ], 
             temperature : 0.7,
         });
-        const text = response.choices[0].message.content;
-        // console.log(text);
-        return text.split('\n').filter((line)=> line.trim().length > 0);
+        const result = response.choices[0].message.content;
+        try{
+            const parsed = JSON.parse(result);
+            return parsed.points ||[];
+        }catch(error){
+            return result.split("\n")
+                .map(line=>line.trim().replace(/^[-•*]\s*/, ""))
+                .filter(line => line.length>0)
+        }
     }catch(error){
-        // console.log(error);
-        return [`• ${description}`];
+        console.log(error)
+        return [`Developed and implemented ${description}`,
+                `Collaborated with team members on ${description}`,
+                `Improved efficiency through ${description}`
+        ];
     }
 };
 
-exports.enhanceText = async (text) =>{
+const enhanceText = async (text) =>{
     const client = getGroqClient();
 
     if(!client){
+        //console.log("client is not available")
         return `Enhanced ${text}`;
     }
 
@@ -58,7 +77,38 @@ exports.enhanceText = async (text) =>{
             messages : [
                 {
                     role: 'system',
-                    content: 'You are a professional resume writer. Enhance the provided text to make it more professional, concise, and impactful for a resume.',
+                        content: `
+                                    You are a professional resume writer.
+
+                                    STRICT RULES:
+                                    - Input contains N lines.
+                                    - Output MUST contain EXACTLY N bullet points.
+                                    - Each input line → EXACTLY ONE improved bullet point.
+                                    - DO NOT merge lines.
+                                    - DO NOT add extra bullets.
+                                    - DO NOT add explanations.
+                                    - Each bullet MUST be a SINGLE line.
+                                    - Start each bullet with a strong action verb.
+                                    - Keep it concise (max 20 words).
+
+                                    FORMAT:
+                                    Return ONLY valid JSON:
+
+                                    EXAMPLE:
+
+                                    Input:
+                                    Built APIs
+                                    Worked on frontend
+
+                                    Output:
+                                    {
+                                        "points" : 
+                                        [
+                                            "Built scalable and secure APIs for high-performance systems",
+                                            "Developed responsive frontend interfaces using modern frameworks"
+                                        ]
+                                    }
+                                `
                 },
                 {
                     role : 'user',
@@ -68,8 +118,93 @@ exports.enhanceText = async (text) =>{
             temperature : 0.7,
         })
 
-        return response.choices[0].message.content;
+        const result = response.choices[0].message.content;
+
+        try{
+            const parsed = JSON.parse(result);
+            return parsed.points || [];
+        }catch(error){
+            console.log("parse error", error);
+            return result.split("\n")
+                       .map(line=>line.trim().replace(/^[-•*]\s*/, ""))
+                       .filter(line => line.length>0)
+        }
     }catch(error){
+        console.log(error)
         return text;
     }
 };
+
+const fallbackExtractor = (readme) => {
+  return readme
+    .split("\n")
+    .filter(line =>
+      line.length > 30 &&
+      !line.startsWith("#") &&
+      !line.toLowerCase().includes("install")
+    )
+    .slice(0, 3);
+};
+
+const pointsfromReadme = async (readme)=>{
+    const client = getGroqClient();
+
+    if(!client){
+        return fallbackExtractor(readme);
+    }
+
+    try{
+        const response = await client.chat.completions.create({
+            model : 'llama-3.1-8b-instant',
+            messages : [
+                {
+                    role: 'system',
+                        content: `You are an expert resume writer.
+                                Convert the GitHub README into 3-5 strong resume bullet points.
+
+                                Rules:
+                                - Start each bullet with an action verb (Built, Developed, Implemented)
+                                - Focus on features, functionality, and impact
+                                - Keep each bullet concise (1 line)
+                                - Do NOT include installation steps or setup instructions
+
+                                Return ONLY valid JSON:
+                                {
+                                    "points" : ["point1", "point2"]
+                                }`
+                },
+                {
+                    role : 'user',
+                    content : `Generate Resume Bullet Points from this readme : ${readme.slice(0, 4000)}`,
+                },
+            ],
+            temperature : 0.7,
+        })
+
+        const result = response.choices[0].message.content;
+        try{
+            const parsed = JSON.parse(result);
+            return parsed.points ||[];
+        }catch(error){
+            return result
+                .split("\n")
+                .map(line => line.trim().replace(/^[-•*]\s*/, ""))
+                .filter(line =>
+                    line.length > 15 &&
+                    !line.startsWith("#") &&
+                    !line.toLowerCase().includes("install")
+                )
+                .slice(0, 5);
+        }
+    }catch(error){
+        console.log(error);
+        return fallbackExtractor(readme);
+    }
+}
+
+module.exports = {
+    getGroqClient, 
+    generatePointsfromDescription,
+    enhanceText,
+    pointsfromReadme
+}
